@@ -1,5 +1,6 @@
 <?php
 
+use App\Application\Order\DeleteOrderService;
 use App\Application\Order\ListOrdersService;
 use App\Infrastructure\Order\JsonOrderRepository;
 use App\Application\Order\CreateOrderService;
@@ -110,4 +111,12 @@ curl -X POST http://localhost:8000/orders \
     </body>
     </html>
 	<?php
+} elseif ( preg_match( '#^/orders/delete/([a-zA-Z0-9\-]+)$#', $uri, $matches ) && $method === 'GET' ) {
+	$id         = $matches[1];
+	$repo       = new JsonOrderRepository();
+	$create     = new CreateOrderService( $repo );
+	$list       = new ListOrdersService( $repo );
+	$delete     = new DeleteOrderService( $repo );
+	$controller = new OrderController( $create, $list, $delete );
+	$controller->delete( $id );
 }

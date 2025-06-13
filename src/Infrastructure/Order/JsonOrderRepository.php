@@ -25,6 +25,14 @@ class JsonOrderRepository implements OrderRepositoryInterface
 		file_put_contents($this->file, json_encode($orders, JSON_PRETTY_PRINT));
 	}
 
+	public function delete(string $id): void
+	{
+		$orders = $this->all();
+		$orders = array_filter($orders, fn(Order $o) => $o->getId() !== $id);
+		file_put_contents($this->file, json_encode(array_values($orders), JSON_PRETTY_PRINT));
+	}
+
+
 	public function all(): array
 	{
 		if (!file_exists($this->file)) {

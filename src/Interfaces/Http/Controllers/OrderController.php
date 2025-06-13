@@ -3,13 +3,15 @@
 namespace App\Interfaces\Http\Controllers;
 
 use App\Application\Order\CreateOrderService;
+use App\Application\Order\DeleteOrderService;
 use App\Application\Order\ListOrdersService;
 
 class OrderController
 {
     public function __construct(
         private readonly CreateOrderService $service,
-	    private readonly ListOrdersService $serviceList
+	    private readonly ListOrdersService $serviceList,
+	    private readonly ?DeleteOrderService $serviceDelete = null
     ) {}
 
 	public function create(): void
@@ -51,14 +53,23 @@ class OrderController
 
 		echo '<ul>';
 		foreach ($orders as $order) {
-			echo sprintf(
-				'<li><strong>%s</strong><br/>%s<br/><small>ID: %s</small></li>',
-				htmlspecialchars($order->title),
-				htmlspecialchars($order->description ?? 'No description'),
-				htmlspecialchars($order->id)
-			);
+			echo "<li><strong>{$order->getTitle()}</strong> — {$order->getDescription()} ";
+			echo "<a href='/orders/delete/{$order->getId()}' style='color: red;' onclick='return confirm(\"Are you sure?\")'>Delete</a></li>";
 		}
+
 		echo '</ul>';
+	}
+
+	public function delete(string $id): void
+	{
+		if (!$this->serviceDelete) {
+			http_response_code(500);
+			echo "Delete service not configured";
+			return;
+		}
+
+		$this->serviceDelete->execute($id);
+		header('Location: /orders');
 	}
 
 }
