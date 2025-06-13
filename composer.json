@@ -1,0 +1,9 @@
+{
+  "name": "ddd/php-core",
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "require": {}
+}
